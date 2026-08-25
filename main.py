@@ -1,6 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from src.utils.db import Base, engine
+# Routers
+from src.resume.router import resume_router
+from src.jobs.router import jobs_router
 
 try:
     Base.metadata.create_all(bind=engine)
@@ -12,6 +15,9 @@ app = FastAPI(
     description="API for validating and processing resumes and job descriptions with separate dedicated endpoints",
     version="2.0.0"
 )
+
+app.include_router(resume_router)
+app.include_router(jobs_router)
 
 # Enable CORS for cross-origin requests from frontend apps (e.g., Angular, React)
 app.add_middleware(
@@ -31,8 +37,7 @@ def read_root():
     return {
         "message": "Resume & Job Application API is running.",
         "endpoints": {
-            "upload_resume": "POST /resume/upload (or POST /resume)",
+            "upload_resume": "POST /resume (or POST /resume)",
             "job_description": "POST /job/description (or POST /job)",
-            "analyze_combined": "POST /resume/analyze"
         }
     }
