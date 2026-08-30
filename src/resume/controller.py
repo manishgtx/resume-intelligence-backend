@@ -6,6 +6,7 @@ from src.resume.models import Resume
 
 def upload_resume(resume: UploadFile,db:Session):
 
+
     # 1) Checking content type is PDF or not.
     if resume.content_type != "application/pdf":
         raise HTTPException(
@@ -62,3 +63,12 @@ def upload_resume(resume: UploadFile,db:Session):
         "filename": resume_record.file_name,
         "message": "Resume uploaded successfully"
     }
+
+def get_resume_by_id(id:int,db:Session):
+    resume_record = db.query(Resume).filter(Resume.id == id).first()
+    if not resume_record:
+        raise HTTPException(
+            status_code=404,
+            detail="Resume not found"
+        )
+    return resume_record

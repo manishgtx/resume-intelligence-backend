@@ -1,3 +1,4 @@
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from src.jobs.dtos import JobDescription
 from src.jobs.models import Job
@@ -19,3 +20,11 @@ def upload_job_descriptions(body:JobDescription,db:Session):
         for job in jobs
         ]
     
+def get_job_by_id(id:int,db:Session):
+    jd = db.query(Job).filter(Job.id == id).first()
+    if not jd:
+        raise HTTPException(
+            status_code=404,
+            detail="Job not found"
+        )
+    return jd
