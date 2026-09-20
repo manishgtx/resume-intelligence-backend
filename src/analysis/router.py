@@ -6,6 +6,10 @@ from sqlalchemy.orm import Session
 
 analysis_router = APIRouter(tags=["Analysis"])
 
-@analysis_router.post("/resume-analysis")
-def resume_analysis(body: ResumeAnalysisCreate,db: Session = Depends(get_db)):
-    return controller.resume_analysis(body,db)
+@analysis_router.get("/resume-analysis")
+def resume_analysis(db: Session = Depends(get_db)):
+    return controller.resume_analysis(db)
+
+@analysis_router.get("/jobs/criticality")
+def get_job_desc(jd:str):
+    return controller.get_job_desc(jd)
