@@ -1,11 +1,10 @@
-from fastapi import UploadFile, HTTPException, BackgroundTasks, status
-from pydantic import BaseModel
+from fastapi import UploadFile, HTTPException, BackgroundTasks
 from pypdf import PdfReader
 import io,os
 from sqlalchemy.orm import Session
 from src.resume.models import ResumeRecord
-from typing import Any, Dict, Optional, cast
 from .services import extract_resume_data
+from src.resume import data
 
 
 from src.utils.db import LocalSession
@@ -65,7 +64,7 @@ def upload_resume(resume: UploadFile,db:Session):
         )
 
     # 5) Save resume in the database
-    resume_record = Resume(
+    resume_record = ResumeRecord(
         file_name=resume.filename,
         file_data=file_data,
         extracted_text=text
@@ -107,6 +106,7 @@ def extract_resume(
     # 4. Return instant 202 Accepted response 
     return {"message": "Processing started", "resume_id": resume_id}
 
+# background Task
 def process_resume(resume_id: int, file_path: str):
     # 1. Create a fresh, independent session for the background task
     db = LocalSession() 
@@ -140,7 +140,12 @@ def process_resume(resume_id: int, file_path: str):
         if os.path.exists(file_path):
             os.remove(file_path)
         
+    
+# Questions
+# Exception handling kaam kaise ka rahi hai hum yaha exception raise kar rahe hai. fir apne router me bhi hum dobara try catch laga rahe hai waha pe bhi inhe except kar rahe hai
+
+def verify_resume(resume_id:int,update_data,db:Session):
+    return data.verify_resume(resume_id,update_data,db)
         
-def get_resume_by_id(resume_id:int,db:Session):
-    # Query the record from the database
-    return db.query(ResumeRecord).filter_by(id=resume_id).first()
+def get_resume_status(resume_id:int,db:Session):
+    return data.get_resume_by_id(resume_id,db)
