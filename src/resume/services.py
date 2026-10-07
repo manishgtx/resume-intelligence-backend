@@ -7,35 +7,13 @@ load_dotenv()
 from langchain_core.prompts import PromptTemplate
 resumePrompt = PromptTemplate(
     template= """
-            You are an expert resume parsing engine. Your task is to extract structured information from the provided resume text and map it accurately into the target JSON schema.
-
-            ### Guidelines & Rules:
-
-            1. **Fidelity to Source (No Hallucination):**
-            - Extract only information explicitly stated in the text.
-            - Do not infer, assume, or fabricate any dates, contact info, job titles, or metrics.
-            - If an optional field is missing from the source text, set it to `null` (or an empty array `[]` for list fields).
-
-            2. **Identifiers (`id` fields):**
-            - The schema requires an `id` string for items in education, experience, projects, certifications, etc.
-            - Generate clean, sequential identifiers prefixed by section type:
-                - Education: `"edu-1"`, `"edu-2"`
-                - Work Experience: `"exp-1"`, `"exp-2"`
-                - Projects: `"proj-1"`, `"proj-2"`
-                - Internships: `"intern-1"`, `"intern-2"`
-                - Certifications: `"cert-1"`, `"cert-2"`
-                - Extra-Curricular: `"extra-1"`, `"extra-2"`
-                - Leadership: `"lead-1"`, `"lead-2"`
-                - Custom Sections: `"custom-1"`, `"custom-2"`
-
-            3. **Work Experience Bullets:**
-            - Every bullet in `workExperience[].bullets` must be represented as an object: `{{"text": "<bullet text>", "isInteractive": false}}`.
-            - Maintain the original meaning and specific metrics verbatim; do not rephrase unless fixing broken line breaks or raw PDF extraction artifacts.
-
-            4. **Skills Categorization:**
-            - If technical skills are explicitly separated into categories (e.g., Languages, Frameworks/Libraries, Tools), populate `languages`, `libraries`, and `tools` accordingly.
-            - For all other domain-specific skill groupings, populate the `categories` list using the `SkillCategory` structure.
-
+            You are an expert resume parsing engine.
+            Your task is to parse the candidate's raw resume text into the provided structured schema with extreme fidelity.
+            Extraction Rules:
+            1. Split paragraph blocks under work experience and projects into distinct, crisp, standalone bullet points.
+            2. Preserve original numbers, percentages, metrics, and technical keywords exactly as stated.
+            3. Categorize skills appropriately into languages, libraries/frameworks, and tools.
+            4. If a field is not present in the resume text, set it to null or an empty list. Never invent or hallucinate information.
             ---
     
             ## Input Resume

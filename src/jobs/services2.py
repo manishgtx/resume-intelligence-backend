@@ -2,174 +2,46 @@ from typing import Any, Optional, Literal
 from pydantic import BaseModel,Field
 from src.resume import ResumeData
 
-# class RequirementItem(BaseModel):
-#     id: str
-#     index: int
-#     title: str
-#     subtitle: str
-#     status: Literal["missing", "met", "partial"]
-#     statusLabel: str
-#     category: Literal["must-have", "key-deliverable", "buried-signal"]
-#     targetLine: int
-#     color: Literal["red", "green", "amber"]
-
-# MissingItemType = Literal["skill", "experience", "summary"]
-
-# AssistanceMode = Literal["bullet", "missing-skill"]
-
-# class RealityCheckInfo(BaseModel):
-#     jdExpectation: str
-#     candidateReality: str
-#     coachAdvice: str
-
-# class AssistanceChip(BaseModel):
-#     id: str
-#     label: str
-#     details: Optional[str] = None
-#     roleHint: Optional[str] = None
-#     isNegative: Optional[bool] = False  # e.g. "Haven't worked with this yet"
-
-# class PlacementOption(BaseModel):
-#     id: str
-#     label: str
-#     section: Literal["experience-unstop", "experience-xyz", "projects", "skills", "custom"]
-#     roleName: str
-#     isRecommended: Optional[bool] = False
-#     reason: Optional[str] = None
-
-# class AuthenticDraftOption(BaseModel):
-#     id: str
-#     title: str
-#     text: str
-#     tags: list[str] = Field(default_factory=list)
-
-# class AssistedInterviewData(BaseModel):
-#     initialPrompt: str
-#     subtext: Optional[str] = None
-#     equivalentTools: list[str] = Field(default_factory=list)
-#     chips: list[AssistanceChip] = Field(default_factory=list)
-#     drillDownQuestion: str
-#     drillDownChips: list[AssistanceChip] = Field(default_factory=list)
-#     realityCheck: RealityCheckInfo
-#     authenticDrafts: list[AuthenticDraftOption] = Field(default_factory=list)
-#     placementOptions: list[PlacementOption] = Field(default_factory=list)
-#     suggestedPlacementId: Optional[str] = None
-
-# class MissingSkill(BaseModel):
-#     id: str
-#     title: str
-#     mentions: int
-#     type: MissingItemType
-#     categoryLabel: str
-#     recommendedPlacement: Literal["skills", "experience", "summary"]
-#     targetRole: Optional[str] = None
-#     suggestedBullet: Optional[str] = None
-#     added: Optional[bool] = False
-#     addedTo: Optional[Literal["skills", "experience", "summary"]] = None
-#     assistedData: Optional[AssistedInterviewData] = None
-
-# class CoachSuggestionVariant(BaseModel):
-#     type: Literal["metrics", "technical", "leadership"]
-#     title: str
-#     suggestedText: str
-#     tags: list[str] = Field(default_factory=list)
-
-# class CoachInsight(BaseModel):
-#     bulletId: int
-#     lineContext: str
-#     currentText: str
-#     feedback: str
-#     whyItMatters: str
-#     variants: dict[Literal["metrics", "technical", "leadership"], CoachSuggestionVariant]
-#     assistedData: Optional[AssistedInterviewData] = None
-
-# class FitLensMetrics(BaseModel):
-#     matchScore: int
-#     matchedCount: int
-#     underperformingCount: int
-#     missingCount: int
-
-# class FitLensRequirements(BaseModel):
-#     mustHaves: list[RequirementItem] = Field(default_factory=list)
-#     keyDeliverables: list[RequirementItem] = Field(default_factory=list)
-#     buriedSignals: list[RequirementItem] = Field(default_factory=list)
-
-# class FitLensAnalysisData(BaseModel):
-#     metrics: FitLensMetrics
-#     requirements: FitLensRequirements
-#     resumeData: ResumeData
-#     coachInsights: dict[int, CoachInsight] = Field(default_factory=dict)
-#     missingSkills: list[MissingSkill] = Field(default_factory=list)
-# # End Of Fit Lens Structure
-
-from typing import Literal, Optional
-from pydantic import BaseModel, Field
-
-
-# ---------------------------------------------------------
-# Sub-types & Enums
-# ---------------------------------------------------------
-
-RequirementStatus = Literal["missing", "met", "partial"]
-RequirementCategory = Literal["must-have", "key-deliverable", "buried-signal"]
-RequirementColor = Literal["red", "green", "amber"]
-MissingItemType = Literal["skill", "experience", "summary"]
-PlacementSection = Literal[
-    "experience-unstop",
-    "experience-xyz",
-    "projects",
-    "skills",
-    "custom",
-]
-PlacementTarget = Literal["skills", "experience", "summary"]
-VariantType = Literal["metrics", "technical", "leadership"]
-
-
-# ---------------------------------------------------------
-# Base Models
-# ---------------------------------------------------------
-
 class RequirementItem(BaseModel):
     id: str
     index: int
     title: str
     subtitle: str
-    status: RequirementStatus
+    status: Literal["missing", "met", "partial"]
     statusLabel: str
-    category: RequirementCategory
+    category: Literal["must-have", "key-deliverable", "buried-signal"]
     targetLine: int
-    color: RequirementColor
+    color: Literal["red", "green", "amber"]
 
+MissingItemType = Literal["skill", "experience", "summary"]
+
+AssistanceMode = Literal["bullet", "missing-skill"]
 
 class RealityCheckInfo(BaseModel):
     jdExpectation: str
     candidateReality: str
     coachAdvice: str
 
-
 class AssistanceChip(BaseModel):
     id: str
     label: str
     details: Optional[str] = None
     roleHint: Optional[str] = None
-    isNegative: bool = False  # e.g. "Haven't worked with this yet"
-
+    isNegative: Optional[bool] = False  # e.g. "Haven't worked with this yet"
 
 class PlacementOption(BaseModel):
     id: str
     label: str
-    section: PlacementSection
+    section: Literal["experience-unstop", "experience-xyz", "projects", "skills", "custom"]
     roleName: str
-    isRecommended: bool = False
+    isRecommended: Optional[bool] = False
     reason: Optional[str] = None
-
 
 class AuthenticDraftOption(BaseModel):
     id: str
     title: str
     text: str
     tags: list[str] = Field(default_factory=list)
-
 
 class AssistedInterviewData(BaseModel):
     initialPrompt: str
@@ -183,34 +55,24 @@ class AssistedInterviewData(BaseModel):
     placementOptions: list[PlacementOption] = Field(default_factory=list)
     suggestedPlacementId: Optional[str] = None
 
-
 class MissingSkill(BaseModel):
     id: str
     title: str
     mentions: int
     type: MissingItemType
     categoryLabel: str
-    recommendedPlacement: PlacementTarget
+    recommendedPlacement: Literal["skills", "experience", "summary"]
     targetRole: Optional[str] = None
     suggestedBullet: Optional[str] = None
-    added: bool = False
-    addedTo: Optional[PlacementTarget] = None
+    added: Optional[bool] = False
+    addedTo: Optional[Literal["skills", "experience", "summary"]] = None
     assistedData: Optional[AssistedInterviewData] = None
 
-
 class CoachSuggestionVariant(BaseModel):
-    type: VariantType
+    type: Literal["metrics", "technical", "leadership"]
     title: str
     suggestedText: str
     tags: list[str] = Field(default_factory=list)
-
-
-# Option A (Recommended for strict schema): Explicit variant mapping object
-class CoachVariants(BaseModel):
-    metrics: CoachSuggestionVariant
-    technical: CoachSuggestionVariant
-    leadership: CoachSuggestionVariant
-
 
 class CoachInsight(BaseModel):
     bulletId: int
@@ -218,9 +80,8 @@ class CoachInsight(BaseModel):
     currentText: str
     feedback: str
     whyItMatters: str
-    variants: CoachVariants
+    variants: dict[Literal["metrics", "technical", "leadership"], CoachSuggestionVariant]
     assistedData: Optional[AssistedInterviewData] = None
-
 
 class FitLensMetrics(BaseModel):
     matchScore: int
@@ -228,26 +89,18 @@ class FitLensMetrics(BaseModel):
     underperformingCount: int
     missingCount: int
 
-
 class FitLensRequirements(BaseModel):
     mustHaves: list[RequirementItem] = Field(default_factory=list)
     keyDeliverables: list[RequirementItem] = Field(default_factory=list)
     buriedSignals: list[RequirementItem] = Field(default_factory=list)
 
-
-# Define ResumeData placeholder or import your actual model
-# class ResumeData(BaseModel):
-#     rawText: Optional[str] = None
-
-
 class FitLensAnalysisData(BaseModel):
     metrics: FitLensMetrics
     requirements: FitLensRequirements
     resumeData: ResumeData
-    # Use list[CoachInsight] or dict[str, CoachInsight] for JSON compatibility
-    coachInsights: list[CoachInsight] = Field(default_factory=list)
+    coachInsights: dict[int, CoachInsight] = Field(default_factory=dict)
     missingSkills: list[MissingSkill] = Field(default_factory=list)
-
+# End Of Fit Lens Structure
 
 from langchain_google_genai import ChatGoogleGenerativeAI
 from dotenv import load_dotenv

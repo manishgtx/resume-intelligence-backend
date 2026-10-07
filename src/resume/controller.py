@@ -1,3 +1,4 @@
+from typing import cast
 from fastapi import UploadFile, HTTPException, BackgroundTasks
 from pypdf import PdfReader
 import io,os
@@ -93,7 +94,7 @@ def extract_resume(
     db.commit()
     db.refresh(new_resume)
     
-    resume_id = new_resume.id
+    resume_id: int = cast(int, new_resume.id)
 
     # 2. Save temporary local file
     file_path = f"/tmp/resume_{resume_id}.pdf"
@@ -105,6 +106,46 @@ def extract_resume(
 
     # 4. Return instant 202 Accepted response 
     return {"message": "Processing started", "resume_id": resume_id}
+
+
+def attach_ids(raw_resume_dict: dict) -> dict:
+    """
+    Attaches clean, deterministic IDs to all resume sections right after LLM extraction,
+    before storing in the database or sending to the frontend.
+    """
+    # 1. Work Experience & Sequential Bullet IDs (1, 2, 3...)
+    bullet_counter = 1
+    for i, exp in enumerate(raw_resume_dict.get("workExperience") or []):
+        exp["id"] = f"exp-{i + 1}"
+        formatted_bullets = []
+        for bullet in exp.get("bullets") or []:
+            text = bullet if isinstance(bullet, str) else bullet.get("text", "")
+            formatted_bullets.append({
+                "id": bullet_counter,
+                "text": text.strip(),
+                "isInteractive": False  # Default False; Step 3 will toggle the weak ones!
+            })
+            bullet_counter += 1
+        exp["bullets"] = formatted_bullets
+
+    # 2. Education IDs (edu-1, edu-2...)
+    for i, edu in enumerate(raw_resume_dict.get("education") or []):
+        edu["id"] = f"edu-{i + 1}"
+
+    # 3. Project IDs (proj-1, proj-2...)
+    for i, proj in enumerate(raw_resume_dict.get("projects") or []):
+        proj["id"] = f"proj-{i + 1}"
+
+    # 4. Certification IDs (cert-1, cert-2...)
+    for i, cert in enumerate(raw_resume_dict.get("certifications") or []):
+        cert["id"] = f"cert-{i + 1}"
+
+    # 5. Internship IDs (intern-1, intern-2...)
+    for i, intern in enumerate(raw_resume_dict.get("internships") or []):
+        intern["id"] = f"intern-{i + 1}"
+
+    return raw_resume_dict
+
 
 # background Task
 def process_resume(resume_id: int, file_path: str):
@@ -124,7 +165,7 @@ def process_resume(resume_id: int, file_path: str):
         
         resume.raw_text = text
         resume.status = "draft"
-        resume.extracted_data = structured_text.model_dump()
+        resume.extracted_data = attach_ids(structured_text.model_dump())
         db.commit()
     except Exception as e:
         db.rollback()
